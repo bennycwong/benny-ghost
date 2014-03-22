@@ -26,7 +26,7 @@
 		results 			: false,
 		rss 				: "/rss",
 		onKeyUp 			: false,
-		result_template 	: "<h3 class='post-title'><a href='{{link}}'>{{title}}</a></h3>",
+		result_template 	: "<h6 class='post-title'><a href='{{link}}'>{{title}}</a></h6>",
 		info_template		: "<p>Number of posts discovered: {{amount}}</p>",
 		displaySearchInfo 	: true,
 		zeroResultsInfo		: true
