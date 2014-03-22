@@ -224,4 +224,5 @@ footer a:hover {
 		padding: 0 1.5em 1.2em 1.5em;
 	}
 }
-.search-box {padding-top:25px;}
+#search-box {padding-top:25px;}
+#featured-posts {padding-top:25px;}
