@@ -25,19 +25,20 @@
 	</head>
 	<body class="{{body_class}}">
 		<header id="header">
-			{{#if @blog.logo}}<a id="logo" href="{{@blog.url}}"><img src="{{@blog.logo}}" alt="{{@blog.title}}" /></a>{{/if}}
+			{{#if @blog.logo}}<a id="logo" href="{{@blog.url}}"><img src="{{asset '/images/selfie.jpg'}}" alt="{{@blog.title}}" /></a>{{/if}}
 			<h1><a href="{{@blog.url}}">{{@blog.title}}</a></h1>
 			<p>{{@blog.description}}</p>
 			<h6><a href="{{@blog.url}}/about">About Me</a></h6>
 			
 			<h5 id="featured-posts">
-			Classic Posts:</h5>
+			
+			<!--Classic Posts:</h5>
 			{{#foreach posts}}
 			{{#if featured}}
 			<h6 class="post-title"><a href="{{url}}">{{title}}</a> </h6>
 			{{/if}}
 			{{/foreach}}
-			
+			-->
 			<form id="search-box">
 			  <input id="search-field" placeholder="Type to search posts"/>
 			
