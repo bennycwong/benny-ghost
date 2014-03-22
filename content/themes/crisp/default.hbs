@@ -29,13 +29,32 @@
 			<h1><a href="{{@blog.url}}">{{@blog.title}}</a></h1>
 			<p>{{@blog.description}}</p>
 			<h6><a href="{{@blog.url}}/about">About</a></h6>
+			<form class="search-box">
+			  <input id="search-field" placeholder="Type to search posts"/>
+			
+			</form>
+			<section id="results"></section>
+			
 		</header>
 		<main id="content">
-			{{{body}}}
+
+		<section id="body">{{{body}}}</section>
+		
+			
 		</main>
+		
 		<footer id="footer">
 			<section id="footer-message">&copy; {{date format='YYYY'}} {{@blog.title}}. All rights reserved. Powered by <a href="http://ghost.org" target="_blank">Ghost</a>. <a href="http://github.com/kathyqian/crisp" target="_blank">Crisp</a> theme by <a href="http://kathyqian.com" target="_blank">Kathy Qian</a>.</section>
 		</footer>
+					
 	{{ghost_foot}}
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
+	<script src="{{asset '/js/jquery.ghostHunter.js'}}"></script>
+	<script>
+	$("#search-field").ghostHunter({
+	    results         : "#results",
+	    onKeyUp         : true,
+	});
+	</script>
 	</body>
 </html>
