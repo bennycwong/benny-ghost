@@ -54,7 +54,8 @@
         "underscore": "1.5.2",
         "unidecode": "0.1.3",
         "validator": "1.4.0",
-        "when": "2.7.0"
+        "when": "2.7.0",
+		"font-awesome": "*"
     },
     "optionalDependencies": {
         "mysql": "2.0.0-alpha9"
@@ -83,6 +84,7 @@
         "require-dir": "~0.1.0",
         "should": "~2.1.1",
         "sinon": "~1.7.3",
-        "supertest": "~0.8.2"
+        "supertest": "~0.8.2",
+		"font-awesome": "*"
     }
 }

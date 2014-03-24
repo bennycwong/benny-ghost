@@ -11,6 +11,7 @@
 	    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,700italic,300,700' rel='stylesheet' type='text/css'>
 		<link href='http://fonts.googleapis.com/css?family=Bree+Serif' rel='stylesheet' type='text/css'>
 		<link rel="stylesheet" type="text/css" href="{{asset '/styles/crisp.css'}}">
+		<link rel="stylesheet" type="text/css" href="{{asset '/styles/font-awesome.css'}}">
 		<link rel="shortcut icon" href="{{@blog.logo}}"/>
 	    {{! Responsive Meta Tags }}
 	    <meta name="HandheldFriendly" content="True" />
@@ -31,8 +32,19 @@
 			<p>{{@blog.description}}</p>
 			<h6><a href="{{@blog.url}}/about">About Me</a></h6>
 			
-			<h5 id="featured-posts">
+	
 			
+			
+			
+			<h5 id="featured-posts"></h5>
+			<h4s>Follow me on</h4><br>
+			
+			<a href="https://twitter.com/bwong337" target="_blank"><i class="fa fa-twitter fa-2x"></i></a>
+			<a href="http://instagram.com/bwong337" target="_blank"><i class="fa fa-instagram fa-2x"></i></a>
+			<a href="https://www.facebook.com/benny.wong.56863" target="_blank"><i class="fa fa-facebook-square fa-2x"></i></a>
+			<a href="http://www.linkedin.com/in/bennycwong" target="_blank"><i class="fa fa-linkedin-square fa-2x"></i></a>
+			
+			<a href="https://github.com/bennycwong" target="_blank"><i class="fa fa-github fa-2x"></i></a>
 			<!--Classic Posts:</h5>
 			{{#foreach posts}}
 			{{#if featured}}
@@ -40,6 +52,7 @@
 			{{/if}}
 			{{/foreach}}
 			-->
+			
 			<form id="search-box">
 			  <input id="search-field" placeholder="Type to search posts"/>
 			
