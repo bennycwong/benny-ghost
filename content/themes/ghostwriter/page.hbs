@@ -1,0 +1,32 @@
+{{!< default}}
+
+<div class="container">
+    {{#post}}
+        <article class="post-container {{post_class}}">
+            <header class="post-header">
+                <h1 class="post-title">{{title}}</h1>
+                {{#if featured}}
+                 <input id="search-field" class="search rounded" placeholder="Type to search posts"/>
+                 <div id="searched-post" class="container" style="display: block;">
+                    <ol class="search-list">
+                        <section id="results"></section>
+                    </ol>
+                </div>
+
+                {{else}}
+
+                <p class="blog-description">{{@blog.description}}</p>
+                {{/if}}
+
+            </header>
+
+            <div class="post-content">
+                {{{content}}}
+
+                {{#if tags}}
+                    <p class="post-tags"><span>Tagged:</span> {{tags}}</p>
+                {{/if}}
+            </div>
+        </article>
+    {{/post}}
+</div>
