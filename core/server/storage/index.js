@@ -1,8 +1,8 @@
-var errors = require('../errors'),
+var errors = require('../errorHandling'),
     storage;
 
 function get_storage() {
-    // TODO: this is where the check for storage apps should go
+    // TODO: this is where the check for storage plugins should go
     // Local file system is the default
     var storageChoice = 'localfilesystem';
 

@@ -1,41 +1,20 @@
-var frontend    = require('../controllers/frontend'),
-    config      = require('../config'),
-    express     = require('express'),
-    utils       = require('../utils'),
+var frontend    = require('../controllers/frontend');
 
-    frontendRoutes;
-
-frontendRoutes = function () {
-    var router = express.Router(),
-        subdir = config.paths.subdir;
+module.exports = function (server) {
+    /*jslint regexp: true */
 
     // ### Frontend routes
-    router.get('/rss/', frontend.rss);
-    router.get('/rss/:page/', frontend.rss);
-    router.get('/feed/', function redirect(req, res) {
-        /*jshint unused:true*/
-        res.set({'Cache-Control': 'public, max-age=' + utils.ONE_YEAR_S});
-        res.redirect(301, subdir + '/rss/');
-    });
-
-    // Tags
-    router.get('/tag/:slug/rss/', frontend.rss);
-    router.get('/tag/:slug/rss/:page/', frontend.rss);
-    router.get('/tag/:slug/page/:page/', frontend.tag);
-    router.get('/tag/:slug/', frontend.tag);
-
-    // Authors
-    router.get('/author/:slug/rss/', frontend.rss);
-    router.get('/author/:slug/rss/:page/', frontend.rss);
-    router.get('/author/:slug/page/:page/', frontend.author);
-    router.get('/author/:slug/', frontend.author);
-
-    // Default
-    router.get('/page/:page/', frontend.homepage);
-    router.get('/', frontend.homepage);
-    router.get('*', frontend.single);
-
-    return router;
+    server.get('/rss/', frontend.rss);
+    server.get('/rss/:page/', frontend.rss);
+    server.get('/page/:page/', frontend.homepage);
+    // Only capture the :slug part of the URL
+    // This regex will always have two capturing groups,
+    // one for date, and one for the slug.
+    // Examples:
+    //  Given `/plain-slug/` the req.params would be [undefined, 'plain-slug']
+    //  Given `/2012/12/24/plain-slug/` the req.params would be ['2012/12/24/', 'plain-slug']
+    //  Given `/plain-slug/edit/` the req.params would be [undefined, 'plain-slug', 'edit']
+    server.get(/^\/([0-9]{4}\/[0-9]{2}\/[0-9]{2}\/)?([^\/.]*)\/$/, frontend.single);
+    server.get(/^\/([0-9]{4}\/[0-9]{2}\/[0-9]{2}\/)?([^\/.]*)\/edit\/$/, frontend.edit);
+    server.get('/', frontend.homepage);
 };
-
-module.exports = frontendRoutes;

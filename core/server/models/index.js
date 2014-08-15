@@ -1,43 +1,39 @@
-var _      = require('lodash'),
-    when   = require('when'),
-    models;
+var migrations = require('../data/migration'),
+    _          = require('underscore');
 
-models = {
+module.exports = {
     Post: require('./post').Post,
     User: require('./user').User,
     Role: require('./role').Role,
     Permission: require('./permission').Permission,
-    Permissions: require('./permission').Permissions,
     Settings: require('./settings').Settings,
     Tag: require('./tag').Tag,
     Base: require('./base'),
-    App: require('./app').App,
-    AppField: require('./appField').AppField,
-    AppSetting: require('./appSetting').AppSetting,
-    Client: require('./client').Client,
-    Accesstoken: require('./accesstoken').Accesstoken,
-    Refreshtoken: require('./refreshtoken').Refreshtoken,
+    Session: require('./session').Session,
 
     init: function () {
-        return true;
+        return migrations.init();
+    },
+    reset: function () {
+        return migrations.reset().then(function () {
+            return migrations.init();
+        });
     },
     // ### deleteAllContent
     // Delete all content from the database (posts, tags, tags_posts)
     deleteAllContent: function () {
         var self = this;
 
-        return self.Post.findAll().then(function (posts) {
-            return when.all(_.map(posts.toJSON(), function (post) {
-                return self.Post.destroy({id: post.id});
-            }));
+        return self.Post.browse().then(function (posts) {
+            _.each(posts.toJSON(), function (post) {
+                self.Post.destroy(post.id);
+            });
         }).then(function () {
-            return self.Tag.findAll().then(function (tags) {
-                return when.all(_.map(tags.toJSON(), function (tag) {
-                    return self.Tag.destroy({id: tag.id});
-                }));
+            self.Tag.browse().then(function (tags) {
+                _.each(tags.toJSON(), function (tag) {
+                    self.Tag.destroy(tag.id);
+                });
             });
         });
     }
 };
-
-module.exports = models;

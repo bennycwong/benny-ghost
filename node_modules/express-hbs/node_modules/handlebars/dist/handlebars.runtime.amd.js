@@ -1,8 +1,8 @@
 /*!
 
- handlebars v2.0.0-alpha.4
+ handlebars v1.3.0
 
-Copyright (C) 2011-2014 by Yehuda Katz
+Copyright (C) 2011 by Yehuda Katz
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -63,16 +63,12 @@ define(
       return escape[chr] || "&amp;";
     }
 
-    function extend(obj /* , ...source */) {
-      for (var i = 1; i < arguments.length; i++) {
-        for (var key in arguments[i]) {
-          if (Object.prototype.hasOwnProperty.call(arguments[i], key)) {
-            obj[key] = arguments[i][key];
-          }
+    function extend(obj, value) {
+      for(var key in value) {
+        if(Object.prototype.hasOwnProperty.call(value, key)) {
+          obj[key] = value[key];
         }
       }
-
-      return obj;
     }
 
     __exports__.extend = extend;var toString = Object.prototype.toString;
@@ -122,11 +118,7 @@ define(
       }
     }
 
-    __exports__.isEmpty = isEmpty;function appendContextPath(contextPath, id) {
-      return (contextPath ? contextPath + '.' : '') + id;
-    }
-
-    __exports__.appendContextPath = appendContextPath;
+    __exports__.isEmpty = isEmpty;
   });
 define(
   'handlebars/exception',["exports"],
@@ -167,15 +159,14 @@ define(
     var Utils = __dependency1__;
     var Exception = __dependency2__["default"];
 
-    var VERSION = "2.0.0-alpha.4";
-    __exports__.VERSION = VERSION;var COMPILER_REVISION = 5;
+    var VERSION = "1.3.0";
+    __exports__.VERSION = VERSION;var COMPILER_REVISION = 4;
     __exports__.COMPILER_REVISION = COMPILER_REVISION;
     var REVISION_CHANGES = {
       1: '<= 1.0.rc.2', // 1.0.rc.2 is actually rev2 but doesn't report it
       2: '== 1.0.0-rc.3',
       3: '== 1.0.0-rc.4',
-      4: '== 1.x.x',
-      5: '>= 2.0.0'
+      4: '>= 1.0.0'
     };
     __exports__.REVISION_CHANGES = REVISION_CHANGES;
     var isArray = Utils.isArray,
@@ -205,9 +196,6 @@ define(
           this.helpers[name] = fn;
         }
       },
-      unregisterHelper: function(name) {
-        delete this.helpers[name];
-      },
 
       registerPartial: function(name, str) {
         if (toString.call(name) === objectType) {
@@ -215,20 +203,15 @@ define(
         } else {
           this.partials[name] = str;
         }
-      },
-      unregisterPartial: function(name) {
-        delete this.partials[name];
       }
     };
 
     function registerDefaultHelpers(instance) {
-      instance.registerHelper('helperMissing', function(/* [args, ]options */) {
-        if(arguments.length === 1) {
-          // A missing field in a {{foo}} constuct.
+      instance.registerHelper('helperMissing', function(arg) {
+        if(arguments.length === 2) {
           return undefined;
         } else {
-          // Someone is actually trying to call something, blow up.
-          throw new Exception("Missing helper: '" + arguments[arguments.length-1].name + "'");
+          throw new Exception("Missing helper: '" + arg + "'");
         }
       });
 
@@ -243,39 +226,18 @@ define(
           return inverse(this);
         } else if (isArray(context)) {
           if(context.length > 0) {
-            if (options.ids) {
-              options.ids = [options.name];
-            }
-
             return instance.helpers.each(context, options);
           } else {
             return inverse(this);
           }
         } else {
-          if (options.data && options.ids) {
-            var data = createFrame(options.data);
-            data.contextPath = Utils.appendContextPath(options.data.contextPath, options.name);
-            options = {data: data};
-          }
-
-          return fn(context, options);
+          return fn(context);
         }
       });
 
       instance.registerHelper('each', function(context, options) {
-        // Allow for {{#each}}
-        if (!options) {
-          options = context;
-          context = this;
-        }
-
         var fn = options.fn, inverse = options.inverse;
         var i = 0, ret = "", data;
-
-        var contextPath;
-        if (options.data && options.ids) {
-          contextPath = Utils.appendContextPath(options.data.contextPath, options.ids[0]) + '.';
-        }
 
         if (isFunction(context)) { context = context.call(this); }
 
@@ -290,24 +252,16 @@ define(
                 data.index = i;
                 data.first = (i === 0);
                 data.last  = (i === (context.length-1));
-
-                if (contextPath) {
-                  data.contextPath = contextPath + i;
-                }
               }
               ret = ret + fn(context[i], { data: data });
             }
           } else {
             for(var key in context) {
               if(context.hasOwnProperty(key)) {
-                if(data) {
-                  data.key = key;
+                if(data) { 
+                  data.key = key; 
                   data.index = i;
                   data.first = (i === 0);
-
-                  if (contextPath) {
-                    data.contextPath = contextPath + key;
-                  }
                 }
                 ret = ret + fn(context[key], {data: data});
                 i++;
@@ -343,26 +297,12 @@ define(
       instance.registerHelper('with', function(context, options) {
         if (isFunction(context)) { context = context.call(this); }
 
-        var fn = options.fn;
-
-        if (!Utils.isEmpty(context)) {
-          if (options.data && options.ids) {
-            var data = createFrame(options.data);
-            data.contextPath = Utils.appendContextPath(options.data.contextPath, options.ids[0]);
-            options = {data:data};
-          }
-
-          return fn(context, options);
-        }
+        if (!Utils.isEmpty(context)) return options.fn(context);
       });
 
       instance.registerHelper('log', function(context, options) {
         var level = options.data && options.data.level != null ? parseInt(options.data.level, 10) : 1;
         instance.log(level, context);
-      });
-
-      instance.registerHelper('lookup', function(obj, field, options) {
-        return obj && obj[field];
       });
     }
 
@@ -390,9 +330,9 @@ define(
     function log(level, obj) { logger.log(level, obj); }
 
     __exports__.log = log;var createFrame = function(object) {
-      var frame = Utils.extend({}, object);
-      frame._parent = object;
-      return frame;
+      var obj = {};
+      Utils.extend(obj, object);
+      return obj;
     };
     __exports__.createFrame = createFrame;
   });
@@ -404,7 +344,6 @@ define(
     var Exception = __dependency2__["default"];
     var COMPILER_REVISION = __dependency3__.COMPILER_REVISION;
     var REVISION_CHANGES = __dependency3__.REVISION_CHANGES;
-    var createFrame = __dependency3__.createFrame;
 
     function checkRevision(compilerInfo) {
       var compilerRevision = compilerInfo && compilerInfo[0] || 1,
@@ -433,14 +372,8 @@ define(
 
       // Note: Using env.VM references rather than local var references throughout this section to allow
       // for external users to override these as psuedo-supported APIs.
-      env.VM.checkRevision(templateSpec.compiler);
-
-      var invokePartialWrapper = function(partial, name, context, hash, helpers, partials, data) {
-        if (hash) {
-          context = Utils.extend({}, context, hash);
-        }
-
-        var result = env.VM.invokePartial.call(this, partial, name, context, helpers, partials, data);
+      var invokePartialWrapper = function(partial, name, context, helpers, partials, data) {
+        var result = env.VM.invokePartial.apply(this, arguments);
         if (result != null) { return result; }
 
         if (env.compile) {
@@ -456,97 +389,74 @@ define(
       var container = {
         escapeExpression: Utils.escapeExpression,
         invokePartial: invokePartialWrapper,
-
-        fn: function(i) {
-          return templateSpec[i];
-        },
-
         programs: [],
-        program: function(i, data) {
-          var programWrapper = this.programs[i],
-              fn = this.fn(i);
+        program: function(i, fn, data) {
+          var programWrapper = this.programs[i];
           if(data) {
-            programWrapper = program(this, i, fn, data);
+            programWrapper = program(i, fn, data);
           } else if (!programWrapper) {
-            programWrapper = this.programs[i] = program(this, i, fn);
+            programWrapper = this.programs[i] = program(i, fn);
           }
           return programWrapper;
-        },
-        programWithDepth: env.VM.programWithDepth,
-
-        data: function(data, depth) {
-          while (data && depth--) {
-            data = data._parent;
-          }
-          return data;
         },
         merge: function(param, common) {
           var ret = param || common;
 
           if (param && common && (param !== common)) {
-            ret = Utils.extend({}, common, param);
+            ret = {};
+            Utils.extend(ret, common);
+            Utils.extend(ret, param);
           }
-
           return ret;
         },
-
+        programWithDepth: env.VM.programWithDepth,
         noop: env.VM.noop,
-        compilerInfo: templateSpec.compiler
+        compilerInfo: null
       };
 
-      var ret = function(context, options) {
+      return function(context, options) {
         options = options || {};
-        var helpers,
-            partials,
-            data = options.data;
+        var namespace = options.partial ? options : env,
+            helpers,
+            partials;
 
-        ret._setup(options);
-        if (!options.partial && templateSpec.useData) {
-          data = initData(context, data);
-        }
-        return templateSpec.main.call(container, context, container.helpers, container.partials, data);
-      };
-
-      ret._setup = function(options) {
         if (!options.partial) {
-          container.helpers = container.merge(options.helpers, env.helpers);
-
-          if (templateSpec.usePartial) {
-            container.partials = container.merge(options.partials, env.partials);
-          }
-        } else {
-          container.helpers = options.helpers;
-          container.partials = options.partials;
+          helpers = options.helpers;
+          partials = options.partials;
         }
-      };
+        var result = templateSpec.call(
+              container,
+              namespace, context,
+              helpers,
+              partials,
+              options.data);
 
-      ret._child = function(i) {
-        return container.programWithDepth(i);
+        if (!options.partial) {
+          env.VM.checkRevision(container.compilerInfo);
+        }
+
+        return result;
       };
-      return ret;
     }
 
-    __exports__.template = template;function programWithDepth(i, data /*, $depth */) {
-      /*jshint -W040 */
-      var args = Array.prototype.slice.call(arguments, 2),
-          container = this,
-          fn = container.fn(i);
+    __exports__.template = template;function programWithDepth(i, fn, data /*, $depth */) {
+      var args = Array.prototype.slice.call(arguments, 3);
 
       var prog = function(context, options) {
         options = options || {};
 
-        return fn.apply(container, [context, container.helpers, container.partials, options.data || data].concat(args));
+        return fn.apply(this, [context, options.data || data].concat(args));
       };
       prog.program = i;
       prog.depth = args.length;
       return prog;
     }
 
-    __exports__.programWithDepth = programWithDepth;function program(container, i, fn, data) {
+    __exports__.programWithDepth = programWithDepth;function program(i, fn, data) {
       var prog = function(context, options) {
         options = options || {};
 
-        return fn.call(container, context, container.helpers, container.partials, options.data || data);
+        return fn(context, options.data || data);
       };
       prog.program = i;
       prog.depth = 0;
@@ -565,13 +475,7 @@ define(
 
     __exports__.invokePartial = invokePartial;function noop() { return ""; }
 
-    __exports__.noop = noop;function initData(context, data) {
-      if (!data || !('root' in data)) {
-        data = data ? createFrame(data) : {};
-        data.root = context;
-      }
-      return data;
-    }
+    __exports__.noop = noop;
   });
 define(
   'handlebars.runtime',["./handlebars/base","./handlebars/safe-string","./handlebars/exception","./handlebars/utils","./handlebars/runtime","exports"],

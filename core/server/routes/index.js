@@ -3,7 +3,6 @@ var api         = require('./api'),
     frontend    = require('./frontend');
 
 module.exports = {
-    apiBaseUri: '/ghost/api/v0.1/',
     api: api,
     admin: admin,
     frontend: frontend
